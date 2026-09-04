@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Downloader Pro</title>
+    <!-- Icon keren dari Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts untuk font modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --spotify-color: #1ed760;
+            --youtube-color: #ff0000;
+            --primary-accent: #6366f1;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        h1 i {
+            color: var(--primary-accent);
+            margin-right: 8px;
+        }
+
+        /* Navigasi Tab / Pilihan Platform */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #334155;
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active[data-platform="spotify"] {
+            background: var(--spotify-color);
+            color: #000;
+        }
+
+        .tab-btn.active[data-platform="youtube"] {
+            background: var(--youtube-color);
+            color: #fff;
+        }
+
+        /* Form Input */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border-radius: 8px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-accent);
+        }
+
+        /* Pilihan Format khusus YouTube */
+        .format-group {
+            display: none;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .radio-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* Tombol Download */
+        .download-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-accent);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+        }
+
+        .download-btn:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+
+        /* Status & Loading */
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .loading-icon {
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fa-solid fa-cloud-arrow-down"></i> Media Downloader</h1>
+    
+    <!-- Tab Menu Icon -->
+    <div class="tabs">
+        <button class="tab-btn active" data-platform="spotify">
+            <i class="fa-brands fa-spotify"></i> Spotify
+        </button>
+        <button class="tab-btn" data-platform="youtube">
+            <i class="fa-brands fa-youtube"></i> YouTube
+        </button>
+    </div>
+
+    <!-- Main Form -->
+    <div class="input-group">
+        <label id="url-label" for="url">Link Lagu Spotify:</label>
+        <div class="input-wrapper">
+            <i id="input-icon" class="fa-brands fa-spotify"></i>
+            <input type="text" id="url" placeholder="Paste link di sini...">
+        </div>
+    </div>
+
+    <!-- Pilihan Format (Hanya muncul jika pilih YouTube) -->
+    <div class="format-group" id="youtube-formats">
+        <label>Pilih Format Output:</label>
+        <div class="radio-options">
+            <label class="radio-label">
+                <input type="radio" name="yt-type" value="audio" checked>
+                <i class="fa-solid fa-music" style="color: #38bdf8;"></i> MP3 (Musik)
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="yt-type" value="video">
+                <i class="fa-solid fa-video" style="color: #f43f5e;"></i> MP4 (Video)
+            </label>
+        </div>
+    </div>
+
+    <button id="btn-submit" class="download-btn">
+        <i class="fa-solid fa-download"></i> Mulai Download
+    </button>
+
+    <!-- Status pesan box -->
+    <div id="status"></div>
+</div>
+
+<script>
+    let currentPlatform = 'spotify';
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const urlLabel = document.getElementById('url-label');
+    const inputIcon = document.getElementById('input-icon');
+    const urlInput = document.getElementById('url');
+    const youtubeFormats = document.getElementById('youtube-formats');
+    const btnSubmit = document.getElementById('btn-submit');
+    const statusDiv = document.getElementById('status');
+
+    // Berpindah platform tab (Spotify / YouTube)
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentPlatform = btn.getAttribute('data-platform');
+
+            if (currentPlatform === 'spotify') {
+                urlLabel.innerText = 'Link Lagu Spotify:';
+                urlInput.placeholder = 'https://open.spotify.com/track/...';
+                inputIcon.className = 'fa-brands fa-spotify';
+                youtubeFormats.style.display = 'none';
+            } else {
+                urlLabel.innerText = 'Link Video/Musik YouTube:';
+                urlInput.placeholder = 'https://www.youtube.com/watch?v=...';
+                inputIcon.className = 'fa-brands fa-youtube';
+                youtubeFormats.style.display = 'block';
+            }
+        });
+    });
+
+    // Proses Pengiriman ke Backend Python
+    btnSubmit.addEventListener('click', async () => {
+        const urlValue = urlInput.value.trim();
+        if (!urlValue) {
+            showStatus('Harap masukkan link terlebih dahulu!', '#ef4444', '#fef2f2');
+            return;
+        }
+
+        // Tampilkan loading state
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch loading-icon"></i> Memproses...`;
+        showStatus('Sedang mengunduh ke laptop server, mohon tunggu sebentar...', '#eab308', '#fef9c3');
+
+        let endpoint = '/download';
+        let payload = { url: urlValue };
+
+        if (currentPlatform === 'youtube') {
+            endpoint = '/download-youtube';
+            const selectedType = document.querySelector('input[name="yt-type"]:checked').value;
+            payload.type = selectedType;
+        }
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showStatus('Download selesai! Mengalihkan ke file...', '#22c55e', '#f0fdf4');
+                // Picu browser untuk mendownload file asli dari backend
+                window.location.href = `/get-file/${encodeURIComponent(result.filename)}`;
+            } else {
+                showStatus('Gagal: ' + result.error, '#ef4444', '#fef2f2');
+            }
+        } catch (error) {
+            showStatus('Terjadi kesalahan jaringan!', '#ef4444', '#fef2f2');
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-download"></i> Mulai Download`;
+        }
+    });
+
+    function showStatus(text, textColor, bgColor) {
+        statusDiv.style.display = 'block';
+        statusDiv.innerText = text;
+        statusDiv.style.color = textColor;
+        statusDiv.style.backgroundColor = bgColor;
+    }
+</script>
+
+</body>
+</html>
