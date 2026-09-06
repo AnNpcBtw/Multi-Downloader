@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi Downloader Pro</title>
+    <title>Multi Downloader</title>
     <!-- Icon keren dari Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png', v='2') }}">
     <!-- Google Fonts untuk font modern -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
@@ -326,5 +327,11 @@
     }
 </script>
 
+
 </body>
+<div style="position: fixed; left: 15px; bottom: 15px; z-index: 9999;">
+	<font color="#7c7c8a" size="2" face="Arial, sans-serif">
+		&copy; <span id="year"></span> <strong>Multi Downloader</strong>. All rights reserved.
+	</font>
+</div>
 </html>
